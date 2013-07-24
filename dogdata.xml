@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<data>
+	<dog id="1">
+		<first_name>Ann</first_name>
+		<last_name>Hedberg</last_name>
+		<owner>Yoshika</owner>
+		<location>Alameda</location>
+		<picture>boxer1.jpg</picture>
+		<left>642</left>
+		<top>427</top>
+		<orientation>right</orientation>
+	</dog>
+	<dog id="2">
+		<first_name>John</first_name>
+		<last_name>Senno</last_name>
+		<owner>Toshi</owner>
+		<location>San Francisco</location>
+		<picture>boxer2.jpg</picture>
+		<left>514</left>
+		<top>448</top>
+		<orientation>right</orientation>
+	</dog>
+	<dog id="3">
+		<first_name>Ann</first_name>
+		<last_name>Miller</last_name>
+		<owner>Satoko</owner>
+		<location>San Ansermo</location>
+		<picture>boxer3.jpg</picture>
+		<left>271</left>
+		<top>420</top>
+		<orientation>left</orientation>
+
+	</dog>
+	<dog id="4">
+		<first_name>Jane</first_name>
+		<last_name>Senno</last_name>
+		<owner>Gary</owner>
+		<location>Berkeley</location>
+		<picture>boxer4.jpg</picture>
+		<left>149</left>
+		<top>429</top>
+		<orientation>left</orientation>
+
+	</dog>
+</data>
