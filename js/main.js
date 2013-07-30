@@ -13,6 +13,11 @@ var treeImg;
 var leafImg;
 var currentDSid = 0;
 
+// Getting browser types
+var nvName = navigator.appName;
+var nvVer = navigator.appVersion;
+var nvAgent = navigator.userAgent;
+
 var xmlDoc;
 
 function init()
@@ -40,7 +45,6 @@ function loadXML()
     xhttp.send();
     xmlDoc = xhttp.responseXML;
 }
-
 
 function drawTree()
 {
@@ -120,15 +124,16 @@ function searchDog(){
 	if(s)
 	{
 		var filter = new RegExp("^" + s + "$", "i"); 
-		for (var i=0; i < dogs.length; i++)
+		for (var i=1; i <= dogs.length; i++)
 		{	
-			firstNameToSearch = dogs[i].getElementsByTagName("first_name")[0].textContent;
-			lastNameToSearch = dogs[i].getElementsByTagName("last_name")[0].textContent;
+			firstNameToSearch = dataFromXML(i, "first_name");
+			lastNameToSearch = dataFromXML(i, "last_name");
 			
 			if( firstNameToSearch.search(filter) != -1 ||
-				lastNameToSearch.search(filter) != -1 )		
+				lastNameToSearch.search(filter) != -1 )
 			{
-				result = dogs[i].getAttribute("id");
+				//result = dogs[i].getAttribute("id");
+				result = i;
 				targetLeaf = document.getElementById("leaf"+result);
 				
 				// Blinking the leaf of the found dog
@@ -238,21 +243,21 @@ function drawLeaves()
 // Leaf Class
 var Leaf = function(idInXML){
 	this.internalId = idInXML;
-	var xmlData = xmlDoc.getElementById(this.internalId);
-	// Workaround for Firefox
-	if(xmlData === null)
-	{
-		xmlData = getDogDataViaXpath(this.internalId);
-	}
+	
+	var xmlTop = dataFromXML(this.internalId, "top");
+	var xmlLeft = dataFromXML(this.internalId, "left");
+	var xmlOrientation = dataFromXML(this.internalId, "orientation");
+	var xmlFirstName = dataFromXML(this.internalId, "first_name");
+	var xmlLastName = dataFromXML(this.internalId, "last_name");
 	
 	var leafDiv = document.createElement("div");
 	//leafDiv.internalId = this.internalId;
 	leafDiv.id = "leaf"+this.internalId;
 	leafDiv.style.width = leafImg.width + "px";
 	leafDiv.style.height = leafImg.height + "px";
-	leafDiv.style.position = "absolute";
-	leafDiv.style.top = xmlData.getElementsByTagName("top")[0].textContent + "px";
-	leafDiv.style.left = xmlData.getElementsByTagName("left")[0].textContent + "px";
+	leafDiv.style.position = "absolute";	
+	leafDiv.style.top = xmlTop + "px";
+	leafDiv.style.left = xmlLeft + "px";
 	leafDiv.addEventListener('click', leafClick, true);
 	document.body.appendChild(leafDiv);
 	
@@ -263,9 +268,13 @@ var Leaf = function(idInXML){
 	leafImgE.setAttribute("width", "100%");
 	leafImgE.setAttribute("height", "100%");
 	//Flipping leaf image for left oriented leaves
-	if(xmlData.getElementsByTagName("orientation")[0].textContent == "left")
+	if(xmlOrientation == "left")
 	{
-		leafImgE.style.cssText= "-webkit-transform: scale(-1, 1);-moz-transform: scale(-1, 1);-o-transform: scale(-1, 1);-ms-transform: scale(-1, 1);transform: scale(-1, 1);";
+		leafImgE.style.cssText= "-webkit-transform: scale(-1, 1);\
+								 -moz-transform: scale(-1, 1);\
+								 -o-transform: scale(-1, 1);\
+								 -ms-transform: scale(-1, 1);\
+								 transform: scale(-1, 1);";
 		leafDiv.style.left = parseInt(leafDiv.style.left) - parseInt(leafDiv.style.width) + "px";
 	}
 	leafDiv.appendChild(leafImgE);
@@ -276,9 +285,9 @@ var Leaf = function(idInXML){
 	dogName.id = "dogName";
 	dogName.internalId = this.internalId;
 	leafDiv.appendChild(dogName);
-	dogName.appendChild(document.createTextNode(xmlData.getElementsByTagName("first_name")[0].textContent));
+	dogName.appendChild(document.createTextNode(xmlFirstName));
 	dogName.appendChild(br);
-	dogName.appendChild(document.createTextNode(xmlData.getElementsByTagName("last_name")[0].textContent));
+	dogName.appendChild(document.createTextNode(xmlLastName));
 	dogName.style.width = leafDiv.style.width;	
 	console.log(leafDiv);
 }
@@ -314,12 +323,6 @@ function leafClick(e)
 var DetailSheet = function(internalId)
 {
 	this.internalId = internalId;
-	this.dogData = xmlDoc.getElementById(this.internalId);
-	//Workaround for Firefox
-	if(this.dogData === null)
-	{
-		this.dogData = getDogDataViaXpath(this.internalId);
-	}
 	this.detailSheet = document.createElement("div");
 	this.detailSheet.id = "detailSheet";
 	this.detailSheet.style.width = detailSheetWidth + "px";
@@ -343,18 +346,20 @@ var DetailSheet = function(internalId)
 		
 	document.body.appendChild(this.detailSheet);
 
-	dataContents(this.dogData);	
+	//dataContents(this.dogData);	
+	dataContents(this.internalId);	
 }
 
-function dataContents(dogData)
+//function dataContents(dogData)
+function dataContents(internalId)
 {
 	var detailSheet = document.getElementById("detailSheet");
+	var dogName = dataFromXML(internalId, "first_name");
+	var owner = dataFromXML(internalId, "owner");
+	var location = dataFromXML(internalId, "location");
 	
-	var dogName = dogData.getElementsByTagName("first_name")[0].textContent;
-	var owner = dogData.getElementsByTagName("owner")[0].textContent;
-	var location = dogData.getElementsByTagName("location")[0].textContent;
 	var dogImg = new Image();
-	dogImg.src = "img/dogs/" + dogData.getElementsByTagName("picture")[0].textContent;
+	dogImg.src = "img/dogs/" + dataFromXML(internalId, "picture");
 
     var nameText = document.createElement("p");
     nameText.id = "nameText";
@@ -383,8 +388,52 @@ function closeClick(e)
 	detailSheet.parentNode.removeChild(detailSheet);
 }
 
+//********** Utility functions *********************************
 function getDogDataViaXpath(internalId){
 	var xPath = "//dog[@id='" + internalId + "']";
 	var xPathResult = xmlDoc.evaluate( xPath, xmlDoc, null, 7, null );
 	return xPathResult.snapshotItem(0);
+}
+
+function dataFromXML(internalId, dataName)
+{
+	var xmlData;
+	var dataToReturn;
+	dataName = dataName.toLowerCase();
+	var dataInXML = ["first_name", 
+					 "last_name", 
+					 "owner", 
+					 "location", 
+					 "picture", 
+					 "left", 
+					 "top", 
+					 "orientation"]
+
+	// Extracting Node list for a specific dog id
+	if( nvName.indexOf("Internet Explorer") > -1 )
+	{
+		xmlData = xmlDoc.selectSingleNode("//dog[@id='" + internalId + "']");	
+	}
+	else if ( nvVer.indexOf("Safari") > -1 || nvVer.indexOf("Chrome") > -1 )
+	{
+		 xmlData = xmlDoc.getElementById(internalId);
+	} 
+	else if ( nvAgent.indexOf("Firefox") > -1)
+	{
+		xmlData = getDogDataViaXpath(internalId);
+	}
+	
+	// Setting data for each dog id
+	if( nvName.indexOf("Internet Explorer") > -1 )
+	{
+		//dataToReturn = xmlDoc.selectSingleNode("//dog[@id='"+this.internalId+"']/top").text;
+		dataToReturn = xmlData.childNodes[dataInXML.indexOf(dataName)].text;
+	}
+	else 
+	{
+		 console.log(xmlData);
+		 dataToReturn = xmlData.getElementsByTagName(dataName)[0].textContent;
+	}
+	
+	return dataToReturn;
 }
