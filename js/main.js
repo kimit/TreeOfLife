@@ -167,7 +167,7 @@ function stopBlinking(aLeaves, w, h)
 	for (var i=0; i < aLeaves.length; i++)
 	{
 		$(aLeaves[i]).stop();
-		$(aLeaves[i]).children('img').attr('src', leafImg.src);
+		$(aLeaves[i]).children('img').attr('src', leafImg.getAttribute('src'));
 		$(aLeaves[i]).css({opacity:1, width:w, height:h}); 
 		console.log('target leaf: ' + aLeaves[i].id);
 	}
