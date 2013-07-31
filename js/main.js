@@ -17,6 +17,15 @@ var currentDSid = 0;
 var nvName = navigator.appName;
 var nvVer = navigator.appVersion;
 var nvAgent = navigator.userAgent;
+var ieV = -1;
+if( nvName.indexOf("Internet Explorer") > -1 )
+	{
+		var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+    	if (re.exec(nvAgent) != null)
+    	{
+      		ieV = parseFloat( RegExp.$1 );
+      	}
+}
 
 var xmlDoc;
 
@@ -408,9 +417,17 @@ function dogSpecificXML(internalId)
 {
 	var xmlData;
 	
-	if( nvName.indexOf("Internet Explorer") > -1 )
+	if( ieV > -1 ) // IE
 	{
-		xmlData = xmlDoc.selectSingleNode("//dog[@id='" + internalId + "']");	
+		if(ieV < 10) // Lower than IE10
+  		{
+			xmlData = xmlDoc.selectSingleNode("//dog[@id='" + internalId + "']");
+		}
+		else
+		{
+			xmlData = xmlDoc.getElementsByTagName("dog")[internalId-1];
+			// xmlData = xmlDoc.getElementsByTagName('dog');
+		}	
 	}
 	else if ( nvVer.indexOf("Safari") > -1 || nvVer.indexOf("Chrome") > -1 )
 	{
@@ -441,10 +458,17 @@ function dataFromXML(xmlData, dataName)
 					 "orientation"]
 
 	// Setting data for each dog id
-	if( nvName.indexOf("Internet Explorer") > -1 )
+	if( ieV > -1 ) // IE
 	{
-		//dataToReturn = xmlDoc.selectSingleNode("//dog[@id='"+this.internalId+"']/top").text;
-		dataToReturn = xmlData.childNodes[dataInXML.indexOf(dataName)].text;
+		if(ieV < 10) // Lower than IE10
+  		{
+			//dataToReturn = xmlDoc.selectSingleNode("//dog[@id='"+this.internalId+"']/top").text;
+			dataToReturn = xmlData.childNodes[dataInXML.indexOf(dataName)].text;
+		}
+		else
+		{
+			dataToReturn = xmlData.getElementsByTagName(dataName)[0].textContent;
+		}
 	}
 	else 
 	{
