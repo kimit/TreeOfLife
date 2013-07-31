@@ -111,124 +111,6 @@ function drawSearchBox()
 	
 }
 
-function searchDog(){
-	var searchBox = document.getElementById("searchBox");
-	var s = searchBox.value;
-	var dogs = xmlDoc.getElementsByTagName("dog");
-	var result = '';
-	var firstNameToSearch;
-	var lastNameToSearch
-	var targetLeaf;
-	var aTargetLeaf = [];
-
-	if(s)
-	{
-		var filter = new RegExp("^" + s + "$", "i"); 
-		for (var i=1; i <= dogs.length; i++)
-		{	
-			firstNameToSearch = dataFromXML(i, "first_name");
-			lastNameToSearch = dataFromXML(i, "last_name");
-			
-			if( firstNameToSearch.search(filter) != -1 ||
-				lastNameToSearch.search(filter) != -1 )
-			{
-				//result = dogs[i].getAttribute("id");
-				result = i;
-				targetLeaf = document.getElementById("leaf"+result);
-				
-				// Blinking the leaf of the found dog
-				var w = leafImg.width;
-				var h = leafImg.height;
-				blink(targetLeaf, parseInt(w), parseInt(h), 1.5);
-				
-				aTargetLeaf.push(targetLeaf);
-				console.log(aTargetLeaf);				
-			}
-		}
-		setTimeout(function(){stopBlinking(aTargetLeaf, w, h);}, blinkingTime);
-	}
-	// Show alert if no match is found
-	if(result == '')
-	{
-		// Prevent alert on hitting enter key on alert
-		// 1st condition for Chrome, 2nd for FF
-		if( searchBox.value && 
-			searchBox.value != searchBox.placeholder )
-		{
-			//alert("The name is not found. Please try again.");
-			showCustomAlert("Not found", "The name was not found. Please try again.", 90, 100);
-			searchBox.value = searchBox.placeholder;
-		}
-	}
-}
-
-function stopBlinking(aLeaves, w, h)
-{
-	for (var i=0; i < aLeaves.length; i++)
-	{
-		$(aLeaves[i]).stop();
-		$(aLeaves[i]).children('img').attr('src', leafImg.getAttribute('src'));
-		$(aLeaves[i]).css({opacity:1, width:w, height:h}); 
-		console.log('target leaf: ' + aLeaves[i].id);
-	}
-}
-
-function showCustomAlert(title, msg, h, w)
-{
-	var myAlert = document.createElement("div");
-	var myTitle = "Alert";
-	var myHeight = 200;
-	var myWidth = 200;
-	myAlert.id = "myAlert";
-	var message = document.createElement("p");
-	message.id = "message";
-	message.appendChild(document.createTextNode(msg));
-	myAlert.appendChild(message);
-	document.body.appendChild(myAlert);
-	myTitle = title;
-	myHeight = h;
-	myWidth = w;
-	$(myAlert).dialog({
-				height: myHeight,
-				width: myWidth,
-				title: myTitle,
-				close:function(){$(this).remove();},
-				resizable:false,
-				position:{
-					my: "center",
-					at: "center",
-					of: "#tree"
-				}
-				});
-}
-
-function blink(selector, originalWidth, originalHeight, scale)
-{
-		$(selector).children('img').attr('src', "img/leaf_found.png");
-		//$(selector).children('p').css({fontSize:'150%'});
-		
-		/*
-		$(selector).stop().animate({width: originalWidth*scale + "px", height: originalHeight*scale + "px"}, 'slow', function(){
-			$(this).stop().animate({width: originalWidth + "px", height:originalHeight + "px"}, 'slow', function(){
-				blink(this, originalWidth, originalHeight, scale);
-			});
-		});
-		*/
-		
-		/*
-		$(selector).children('p').stop().animate({fontSize: "200%"}, 'slow', function(){
-			$(this).stop().animate({fontSize: "100%"}, 'fast');
-		});
-		*/
-		
-		$(selector).fadeOut('slow', function(){
-		    	$(this).fadeIn('slow', function(){
-		    		blink(this, originalWidth, originalHeight, scale);
-		    	});
-		});
-		
-}
-
 function drawLeaves()
 {
 	var dogs = xmlDoc.getElementsByTagName("dog");
@@ -244,11 +126,12 @@ function drawLeaves()
 var Leaf = function(idInXML){
 	this.internalId = idInXML;
 	
-	var xmlTop = dataFromXML(this.internalId, "top");
-	var xmlLeft = dataFromXML(this.internalId, "left");
-	var xmlOrientation = dataFromXML(this.internalId, "orientation");
-	var xmlFirstName = dataFromXML(this.internalId, "first_name");
-	var xmlLastName = dataFromXML(this.internalId, "last_name");
+	var thisDogXML = dogSpecificXML(this.internalId);
+	var xmlTop = dataFromXML(thisDogXML, "top");
+	var xmlLeft = dataFromXML(thisDogXML, "left");
+	var xmlOrientation = dataFromXML(thisDogXML, "orientation");
+	var xmlFirstName = dataFromXML(thisDogXML, "first_name");
+	var xmlLastName = dataFromXML(thisDogXML, "last_name");
 	
 	var leafDiv = document.createElement("div");
 	//leafDiv.internalId = this.internalId;
@@ -354,12 +237,14 @@ var DetailSheet = function(internalId)
 function dataContents(internalId)
 {
 	var detailSheet = document.getElementById("detailSheet");
-	var dogName = dataFromXML(internalId, "first_name");
-	var owner = dataFromXML(internalId, "owner");
-	var location = dataFromXML(internalId, "location");
+	
+	var thisDogXML = dogSpecificXML(internalId);
+	var dogName = dataFromXML(thisDogXML, "first_name");
+	var owner = dataFromXML(thisDogXML, "owner");
+	var location = dataFromXML(thisDogXML, "location");
 	
 	var dogImg = new Image();
-	dogImg.src = "img/dogs/" + dataFromXML(internalId, "picture");
+	dogImg.src = "img/dogs/" + dataFromXML(thisDogXML, "picture");
 
     var nameText = document.createElement("p");
     nameText.id = "nameText";
@@ -388,28 +273,141 @@ function closeClick(e)
 	detailSheet.parentNode.removeChild(detailSheet);
 }
 
+//******* Search related functions ******************
+function searchDog(){
+	var searchBox = document.getElementById("searchBox");
+	var s = searchBox.value;
+	var dogs = xmlDoc.getElementsByTagName("dog");
+	var result = '';
+	var firstNameToSearch;
+	var lastNameToSearch
+	var targetLeaf;
+	var aTargetLeaf = [];
+
+	if(s)
+	{
+		var filter = new RegExp("^" + s + "$", "i"); 
+		for (var i=1; i <= dogs.length; i++)
+		{	
+			var thisDogXML = dogSpecificXML(i);
+			
+			firstNameToSearch = dataFromXML(thisDogXML, "first_name");
+			lastNameToSearch = dataFromXML(thisDogXML, "last_name");
+			
+			if( firstNameToSearch.search(filter) != -1 ||
+				lastNameToSearch.search(filter) != -1 )
+			{
+				//result = dogs[i].getAttribute("id");
+				result = i;
+				targetLeaf = document.getElementById("leaf"+result);
+				
+				// Blinking the leaf of the found dog
+				var w = leafImg.width;
+				var h = leafImg.height;
+				blink(targetLeaf, parseInt(w), parseInt(h), 1.5);
+				
+				aTargetLeaf.push(targetLeaf);
+				console.log(aTargetLeaf);				
+			}
+		}
+		setTimeout(function(){stopBlinking(aTargetLeaf, w, h);}, blinkingTime);
+	}
+	// Show alert if no match is found
+	if(result == '')
+	{
+		// Prevent alert on hitting enter key on alert
+		// 1st condition for Chrome, 2nd for FF
+		if( searchBox.value && 
+			searchBox.value != searchBox.placeholder )
+		{
+			//alert("The name is not found. Please try again.");
+			showCustomAlert("Not found", "The name was not found. Please try again.", 90, 100);
+			searchBox.value = searchBox.placeholder;
+		}
+	}
+}
+
+function stopBlinking(aLeaves, w, h)
+{
+	for (var i=0; i < aLeaves.length; i++)
+	{
+		$(aLeaves[i]).stop();
+		$(aLeaves[i]).children('img').attr('src', leafImg.getAttribute('src'));
+		$(aLeaves[i]).css({opacity:1, width:w, height:h}); 
+		console.log('target leaf: ' + aLeaves[i].id);
+	}
+}
+
+function showCustomAlert(title, msg, h, w)
+{
+	var myAlert = document.createElement("div");
+	var myTitle = "Alert";
+	var myHeight = 200;
+	var myWidth = 200;
+	myAlert.id = "myAlert";
+	var message = document.createElement("p");
+	message.id = "message";
+	message.appendChild(document.createTextNode(msg));
+	myAlert.appendChild(message);
+	document.body.appendChild(myAlert);
+	myTitle = title;
+	myHeight = h;
+	myWidth = w;
+	$(myAlert).dialog({
+				height: myHeight,
+				width: myWidth,
+				title: myTitle,
+				close:function(){$(this).remove();},
+				resizable:false,
+				position:{
+					my: "center",
+					at: "center",
+					of: "#tree"
+				}
+				});
+}
+
+function blink(selector, originalWidth, originalHeight, scale)
+{
+		$(selector).children('img').attr('src', "img/leaf_found.png");
+		//$(selector).children('p').css({fontSize:'150%'});
+		
+		/*
+		$(selector).stop().animate({width: originalWidth*scale + "px", height: originalHeight*scale + "px"}, 'slow', function(){
+			$(this).stop().animate({width: originalWidth + "px", height:originalHeight + "px"}, 'slow', function(){
+				blink(this, originalWidth, originalHeight, scale);
+			});
+		});
+		*/
+		
+		/*
+		$(selector).children('p').stop().animate({fontSize: "200%"}, 'slow', function(){
+			$(this).stop().animate({fontSize: "100%"}, 'fast');
+		});
+		*/
+		
+		$(selector).fadeOut('slow', function(){
+		    	$(this).fadeIn('slow', function(){
+		    		blink(this, originalWidth, originalHeight, scale);
+		    	});
+		});
+		
+}
+
+
 //********** Utility functions *********************************
+// Workaround for Firefox, getting Nodelist from xml by id attribute
 function getDogDataViaXpath(internalId){
 	var xPath = "//dog[@id='" + internalId + "']";
 	var xPathResult = xmlDoc.evaluate( xPath, xmlDoc, null, 7, null );
 	return xPathResult.snapshotItem(0);
 }
 
-function dataFromXML(internalId, dataName)
+// Extracting Node list for a specific dog id
+function dogSpecificXML(internalId)
 {
 	var xmlData;
-	var dataToReturn;
-	dataName = dataName.toLowerCase();
-	var dataInXML = ["first_name", 
-					 "last_name", 
-					 "owner", 
-					 "location", 
-					 "picture", 
-					 "left", 
-					 "top", 
-					 "orientation"]
-
-	// Extracting Node list for a specific dog id
+	
 	if( nvName.indexOf("Internet Explorer") > -1 )
 	{
 		xmlData = xmlDoc.selectSingleNode("//dog[@id='" + internalId + "']");	
@@ -423,6 +421,25 @@ function dataFromXML(internalId, dataName)
 		xmlData = getDogDataViaXpath(internalId);
 	}
 	
+	console.log(xmlData);
+	
+	return xmlData;
+}
+
+// From given Nodelist, extracting specific datum
+function dataFromXML(xmlData, dataName)
+{
+	var dataToReturn;
+	dataName = dataName.toLowerCase();
+	var dataInXML = ["first_name", 
+					 "last_name", 
+					 "owner", 
+					 "location", 
+					 "picture", 
+					 "left", 
+					 "top", 
+					 "orientation"]
+
 	// Setting data for each dog id
 	if( nvName.indexOf("Internet Explorer") > -1 )
 	{
@@ -431,7 +448,6 @@ function dataFromXML(internalId, dataName)
 	}
 	else 
 	{
-		 console.log(xmlData);
 		 dataToReturn = xmlData.getElementsByTagName(dataName)[0].textContent;
 	}
 	
