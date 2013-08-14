@@ -23,8 +23,7 @@ function initEdit()
 	editArea.style.top = 0;
 	editArea.style.left = 750 + "px";
 	
-	var treeArea = document.body;
-	
+	var treeArea = editArea;
 	treeArea.ondragover = allowDrop;
 	treeArea.ondragenter = allowDrop;
 	treeArea.ondrop = drop;
@@ -69,7 +68,7 @@ function drop(evt)
 	
 	droppedId.style.top = "100px";
 	droppedId.style.left = "200px";
-	document.body.appendChild(droppedId);
+	this.appendChild(droppedId);
 
 	document.getElementById("editXPos").innerHTML = "dropped";
 }
