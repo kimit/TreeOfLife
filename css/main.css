@@ -378,6 +378,11 @@ textarea {
 	height: 15px;
 }
 
+/* Edit area */
+
+#editArea {
+	background:#AAAAAA;
+}
 
 /*
 #tree {
