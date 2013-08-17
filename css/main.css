@@ -384,6 +384,10 @@ textarea {
 	background:#AAAAAA;
 }
 
+/* For Drag and Drop in edit page */
+.drag {
+	position:relative;
+}
 /*
 #tree {
  	background-color: #D8A963;
