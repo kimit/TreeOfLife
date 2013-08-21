@@ -382,12 +382,29 @@ textarea {
 
 #editArea {
 	background:#AAAAAA;
+	font-size: 80%;
 }
 
+#editArea h3{
+	/*text-align: center;	*/
+}
+
+#editArea form label, form input{
+	display: inline-block;
+}
+
+#editArea form label{
+	width: 100px;
+}
+
+#editArea form input{
+	margin-bottom: 5px;
+}
 /* For Drag and Drop in edit page */
 .drag {
 	position:relative;
 }
+
 /*
 #tree {
  	background-color: #D8A963;

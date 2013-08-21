@@ -23,6 +23,9 @@ var actualPosField;   			// makes life easier
 var jsonPosField;
 var xForJson = 0;
 var yForJson = 0;
+
+var flipLeaf;
+var leafWidth = 0;
  
 // Edit Area
 function initEdit()
@@ -33,9 +36,11 @@ function initEdit()
 	editArea.style.height = "400px";
 	editArea.style.position = "absolute";
 	editArea.style.top = 0;
-	editArea.style.left = 750 + "px";
+	editArea.style.left = treeArea + "px";
 	
-
+	var editTitle = document.createElement("h3");
+	editTitle.innerHTML = "Add Dog Information";
+	editArea.appendChild(editTitle);
 /*	treeArea.ondragover = allowDrop;
 	treeArea.ondragenter = allowDrop;
 	treeArea.ondrop = drop;
@@ -47,10 +52,12 @@ function initEdit()
 	
 	editInfo();
 	
-	actualPosField = document.getElementById("actualPos");
+	actualPosField = document.getElementById("editJson");
 	jsonPosField = document.getElementById("jsonPos");
 	
 	initDragDrop();
+	
+	flipLeaf = document.getElementById("flipLeaf");
 }
 
 
@@ -58,7 +65,7 @@ function initEdit()
 function loadEditLeaf(){
 	var editLeaf = new Image();
 	editLeaf.id = "editLeaf";
-	editLeaf.src = "img/leaf.png";
+	editLeaf.src = "img/leaf_found.png";
 	editLeaf.setAttribute("class", "drag");
 	editLeaf.draggable = true;
 	//editLeaf.ondragstart = dragStart;
@@ -66,6 +73,41 @@ function loadEditLeaf(){
 	
 	editLeafX = editLeaf.style.top;
 	editLeafY = editLeaf.style.left;
+	
+	editLeaf.onload = function(){leafWidth = editLeaf.width};
+	
+	
+	// Checkbox to flip the leaf
+	var flipLeaf = document.createElement("input");
+	flipLeaf.type = "checkbox";
+	flipLeaf.id = "flipLeaf";
+	var flipLeafLabel = document.createElement("label");
+	flipLeafLabel.innerHTML ="Flip the leaf vertically"; 
+	flipLeafLabel.setAttribute("for", flipLeaf.id);
+	editArea.appendChild(flipLeaf);
+	editArea.appendChild(flipLeafLabel);
+	
+	flipLeaf.onchange = function(){
+		var leafImg = document.getElementById("editLeaf");
+		
+		if(flipLeaf.checked === true)
+		{
+			leafImg.style.cssText= "-webkit-transform: scale(-1, 1);\
+									 -moz-transform: scale(-1, 1);\
+									 -o-transform: scale(-1, 1);\
+									 -ms-transform: scale(-1, 1);\
+									 transform: scale(-1, 1);";
+			//leafDiv.style.left = parseInt(leafDiv.style.left) - parseInt(leafDiv.style.width) + "px";
+		}
+		else
+		{
+			leafImg.style.cssText= "-webkit-transform: scale(1, 1);\
+									 -moz-transform: scale(1, 1);\
+									 -o-transform: scale(1, 1);\
+									 -ms-transform: scale(1, 1);\
+									 transform: scale(1, 1);";
+		}
+	}
 }
 
 
@@ -112,7 +154,7 @@ function myOnMouseDown(e)
     // IE uses srcElement, others use target
     var target = e.target != null ? e.target : e.srcElement;
     
-    actualPosField.value = target.className == 'drag' 
+    actualPosField.innerHTML = target.className == 'drag' 
         ? 'draggable element clicked' 
         : 'NON-draggable element clicked';
 	
@@ -163,12 +205,19 @@ function myOnMouseMove(e)
     _dragElement.style.top = (_offsetY + e.clientY - _startY) + 'px';
     
     xForJson = _offsetX + e.clientX - _startX + treeArea;
+    
+    if(flipLeaf.checked === true)
+    {
+    	xForJson += leafWidth;
+    }
+    
+    
     yForJson = _offsetY + e.clientY - _startY;
     
-    actualPosField.value = _dragElement.style.left + ', ' + 
+    actualPosField.innerHTML = "Actual Position: " + _dragElement.style.left + ', ' + 
         _dragElement.style.top;   
         
-    jsonPosField.value = xForJson + ', ' + yForJson;
+    jsonPosField.value = xForJson + ',' + yForJson;
     
 }
 
@@ -186,7 +235,7 @@ function myOnMouseUp(e)
         // this is how we know we're not dragging      
         _dragElement = null;
         
-        actualPosField.value = 'mouse up';
+        actualPosField.innerHTML = 'mouse up';
     }
 }
 
@@ -201,30 +250,26 @@ function ExtractNumber(value)
 function editInfo()
 {
 	var infoForm = document.createElement("form");
-	var lActualPos = document.createElement("label");
 	var lJsonPos = document.createElement("label");
 	var lFirstName = document.createElement("label");
 	var lLastName = document.createElement("label");
 	var lOwner = document.createElement("label");
 	var lLocation = document.createElement("label");
 	
-	lActualPos.innerHTML = "Actual Position:";
-	lJsonPos.innerHTML = "Postion in Tree:";
-	lFirstName.innerHTML = "First_Name:";
-	lLastName.innerHTML = "Last_Name:";
+	lJsonPos.innerHTML = "Position on Tree:";
+	lFirstName.innerHTML = "First Name:";
+	lLastName.innerHTML = "Last Name:";
 	lOwner.innerHTML = "Owner:";
 	lLocation.innerHTML = "Location:";
 	
-	var actualPos = document.createElement("input");
 	var jsonPos = document.createElement("input");
 	var fFirstName = document.createElement("input");
 	var fLastName = document.createElement("input");
 	var fOwner = document.createElement("input");
 	var fLocation = document.createElement("input");
 	var bWrite = document.createElement("input");
-	var fJson = document.createElement("input");
+	var fJson = document.createElement("p");
 	
-	actualPos.id = "actualPos";
 	jsonPos.id = "jsonPos";
 	fFirstName.id = "editFirstName";
 	fLastName.id = "editLastName";
@@ -233,54 +278,78 @@ function editInfo()
 	bWrite.id = "editWrite";
 	fJson.id = "editJson";
 	
-	actualPos.type = "text";
 	jsonPos.type = "text";
 	fFirstName.type = "text";
 	fLastName.type = "text";
 	fOwner.type = "text";
 	fLocation.type = "text";
 	bWrite.type = "submit";
-	fJson.type = "textarea";
 	
-	lActualPos.setAttribute("for", actualPos.id);
 	lJsonPos.setAttribute("for", jsonPos.id);
 	lFirstName.setAttribute("for", fFirstName.id);
 	lLastName.setAttribute("for", fLastName.id);
 	lOwner.setAttribute("for", fOwner.id);
 	lLocation.setAttribute("for", fLocation.id);
 	
-	infoForm.appendChild(lActualPos);
-	infoForm.appendChild(actualPos);
-	infoForm.appendChild(lJsonPos);
-	infoForm.appendChild(jsonPos);
-	infoForm.appendChild(lFirstName);
-	infoForm.appendChild(fFirstName);
-	infoForm.appendChild(lLastName);
-	infoForm.appendChild(fLastName);
-	infoForm.appendChild(lOwner);
-	infoForm.appendChild(fOwner);
-	infoForm.appendChild(lLocation);
-	infoForm.appendChild(fLocation);
+	var jsonDiv = document.createElement("div");
+	var fNameDiv = document.createElement("div");
+	var lNameDiv = document.createElement("div");
+	var ownerDiv = document.createElement("div");
+	var locationDiv = document.createElement("div");
+	
+	jsonDiv.appendChild(lJsonPos);
+	jsonDiv.appendChild(jsonPos);
+	infoForm.appendChild(jsonDiv);
+	fNameDiv.appendChild(lFirstName);
+	fNameDiv.appendChild(fFirstName);
+	infoForm.appendChild(fNameDiv);
+	lNameDiv.appendChild(lLastName);
+	lNameDiv.appendChild(fLastName);
+	infoForm.appendChild(lNameDiv);
+	ownerDiv.appendChild(lOwner);
+	ownerDiv.appendChild(fOwner);
+	infoForm.appendChild(ownerDiv);
+	locationDiv.appendChild(lLocation);
+	locationDiv.appendChild(fLocation);
+	infoForm.appendChild(locationDiv);
 	infoForm.appendChild(bWrite);
 	editArea.appendChild(infoForm);
 	
 	editArea.appendChild(fJson);
 
-	actualPos.value = "Drag the leaf above";
 	jsonPos.value = "Drag the leaf above";
 	bWrite.value = "Write JSON";
 	
-	bWrite.onclick = writeJSON;
-
+	bWrite.onmouseup = writeJSON;
 }
 
 // Write out the location and info to XML
 
 function writeJSON()
 {
-	var fWrite = document.getElementById("editJson");
+	var leafPos = $("#jsonPos").val();
+	var leafX = leafPos.split(',')[0];
+	var leafY = leafPos.split(',')[1];
+	var sOrientation = "right";
 	
-	// Need AJAX capability!
-	fWrite.value = "hahah";
+	if(flipLeaf.checked === true){
+		sOrientation = "left";
+	}
+	
+	var jsonWrite = '{' +
+        '"-id": "1",' + 
+        '"first_name": "' + $("#editFirstName").val() + '",' +
+        '"last_name": "' + $("#editLastName").val() + '",' +
+        '"owner": "' + $("#editOwner").val() + '",' +
+        '"location": "' + $("#editLocation").val() + '",' +
+        '"picture": "boxer1.jpg",' +
+        '"left": "' + leafX + '",' +
+        '"top": "' + leafY + '",' +
+        '"orientation": "' + sOrientation +'"' +
+      '}';
+	
+	actualPosField.innerHTML = "Copy JSON from the Alert dialog.";
+	
+	alert(jsonWrite);
 	
 } 
