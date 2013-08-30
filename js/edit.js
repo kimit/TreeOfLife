@@ -337,7 +337,7 @@ function writeJSON()
 	}
 	
 	var jsonWrite = '{' +
-        '"-id": "1",' + 
+        '"_id": "1",' + 
         '"first_name": "' + $("#editFirstName").val() + '",' +
         '"last_name": "' + $("#editLastName").val() + '",' +
         '"owner": "' + $("#editOwner").val() + '",' +
