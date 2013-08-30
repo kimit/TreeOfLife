@@ -1,0 +1,48 @@
+{
+	"dog": [
+	  {
+	    "_id": "1",
+	    "first_name": "Ann",
+	    "last_name": "Hedberg",
+	    "owner": "Yoshika",
+	    "location": "Alameda",
+	    "picture": "boxer1.jpg",
+	    "left": "642",
+	    "top": "427",
+	    "orientation": "right"
+	  },
+	  {
+	    "_id": "2",
+	    "first_name": "John",
+	    "last_name": "Senno",
+	    "owner": "Toshi",
+	    "location": "San Francisco",
+	    "picture": "boxer2.jpg",
+	    "left": "514",
+	    "top": "448",
+	    "orientation": "right"
+	  },
+	  {
+	    "_id": "3",
+	    "first_name": "Ann",
+	    "last_name": "Miller",
+	    "owner": "Satoko",
+	    "location": "San Ansermo",
+	    "picture": "boxer3.jpg",
+	    "left": "271",
+	    "top": "420",
+	    "orientation": "left"
+	  },
+	  {
+	    "_id": "4",
+	    "first_name": "Jane",
+	    "last_name": "Senno",
+	    "owner": "Gary",
+	    "location": "Berkeley",
+	    "picture": "boxer4.jpg",
+	    "left": "149",
+	    "top": "429",
+	    "orientation": "left"
+	  }
+	]
+}

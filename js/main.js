@@ -1,3 +1,12 @@
+/*
+ * Author: Kimitoshi Senno
+ * Date: May 15, 2013
+ * For: Tree Of Life application
+ *      Application to commemorate dogs by showing their information
+ * Revised: September 26, 2013:
+ * 			Modified to code to load data from Json instead of XML
+ */
+
 var treeScale = 0.5;
 var treeWidth = 0;
 var treeHeight = 0;
@@ -27,11 +36,13 @@ if( nvName.indexOf("Internet Explorer") > -1 )
       	}
 }
 
-var xmlDoc;
+var jsonDoc;
+//var xmlDoc; // XML version
 
 function init()
 {
-	loadXML();
+	loadJson();
+	//loadXML();
 	//cv = document.getElementById("canvas");
 	//ctx = cv.getContext("2d");
 	treeImg = new Image();
@@ -40,9 +51,11 @@ function init()
 	treeImg.onload = drawTree;
 }
 
-function loadXML()
+
+
+function loadJson()
 {
-	 // load xml file
+	 // load Json file
 	 var xhttp;
     if (window.XMLHttpRequest) {
        xhttp = new XMLHttpRequest();
@@ -50,9 +63,18 @@ function loadXML()
        xhttp = new ActiveXObject("Microsoft.XMLHTTP");
     }
 
-    xhttp.open("GET", "dogdata.xml", false);
+    xhttp.open("GET", "dogdata.json");
+    xhttp.onreadystatechange = function()
+    {
+    	if( xhttp.status === 200 &&
+    		xhttp.readyState === 4 )
+    	{
+    		jsonDoc = JSON.parse(xhttp.responseText);
+    		console.log(jsonDoc.dog.length);
+    	}
+    }
+    
     xhttp.send();
-    xmlDoc = xhttp.responseXML;
 }
 
 function drawTree()
@@ -122,25 +144,36 @@ function drawSearchBox()
 
 function drawLeaves()
 {
-	var dogs = xmlDoc.getElementsByTagName("dog");
-	var idInXML = 0;
+	//var dogs = xmlDoc.getElementsByTagName("dog");
+	var dogs = jsonDoc.dog;
+	var idInData = 0;
 	var leaf;
 	for (var i=0; i < dogs.length; i++){
-		idInXML = xmlDoc.getElementsByTagName("dog")[i].getAttribute("id");
-		leaf = new Leaf(idInXML);
+		//idInData = xmlDoc.getElementsByTagName("dog")[i].getAttribute("id");
+		idInData = dogs[i]._id;
+		leaf = new Leaf(idInData);
 	}
 }
 
 // Leaf Class
-var Leaf = function(idInXML){
-	this.internalId = idInXML;
+var Leaf = function(idInData){
+	this.internalId = idInData;
 	
-	var thisDogXML = dogSpecificXML(this.internalId);
-	var xmlTop = dataFromXML(thisDogXML, "top");
-	var xmlLeft = dataFromXML(thisDogXML, "left");
-	var xmlOrientation = dataFromXML(thisDogXML, "orientation");
-	var xmlFirstName = dataFromXML(thisDogXML, "first_name");
-	var xmlLastName = dataFromXML(thisDogXML, "last_name");
+	/* //XML version
+	var thisDog = dogSpecificXML(this.internalId);
+	var xmlTop = dataFromXML(thisDogData, "top");
+	var xmlLeft = dataFromXML(thisDogData, "left");
+	var xmlOrientation = dataFromXML(thisDogData, "orientation");
+	var xmlFirstName = dataFromXML(thisDogData, "first_name");
+	var xmlLastName = dataFromXML(thisDogData, "last_name");
+	*/
+	
+	var thisDogData = dogSpecificJson(this.internalId);
+	var xmlTop = thisDogData.top;
+	var xmlLeft = thisDogData.left;
+	var xmlOrientation = thisDogData.orientation;
+	var xmlFirstName = thisDogData.first_name;
+	var xmlLastName = thisDogData.last_name;
 	
 	var leafDiv = document.createElement("div");
 	//leafDiv.internalId = this.internalId;
@@ -247,13 +280,20 @@ function dataContents(internalId)
 {
 	var detailSheet = document.getElementById("detailSheet");
 	
-	var thisDogXML = dogSpecificXML(internalId);
-	var dogName = dataFromXML(thisDogXML, "first_name");
-	var owner = dataFromXML(thisDogXML, "owner");
-	var location = dataFromXML(thisDogXML, "location");
+	/* // XML Version
+	var thisDogData = dogSpecificXML(internalId);
+	var dogName = dataFromXML(thisDogData, "first_name");
+	var owner = dataFromXML(thisDogData, "owner");
+	var location = dataFromXML(thisDogData, "location");
+	* */
+	
+	var thisDogData = dogSpecificJson(internalId);
+	var dogName = thisDogData.first_name;
+	var owner = thisDogData.owner;
+	var location = thisDogData.location;
 	
 	var dogImg = new Image();
-	dogImg.src = "img/dogs/" + dataFromXML(thisDogXML, "picture");
+	dogImg.src = "img/dogs/" + thisDogData.picture;
 
     var nameText = document.createElement("p");
     nameText.id = "nameText";
@@ -286,7 +326,8 @@ function closeClick(e)
 function searchDog(){
 	var searchBox = document.getElementById("searchBox");
 	var s = searchBox.value;
-	var dogs = xmlDoc.getElementsByTagName("dog");
+	//var dogs = xmlDoc.getElementsByTagName("dog");
+	var dogs = jsonDoc.dog;
 	var result = '';
 	var firstNameToSearch;
 	var lastNameToSearch
@@ -298,10 +339,16 @@ function searchDog(){
 		var filter = new RegExp("^" + s + "$", "i"); 
 		for (var i=1; i <= dogs.length; i++)
 		{	
-			var thisDogXML = dogSpecificXML(i);
+			/* // XML Version
+			var thisDogData = dogSpecificXML(i);
+			firstNameToSearch = dataFromXML(thisDogData, "first_name");
+			lastNameToSearch = dataFromXML(thisDogData, "last_name");
+			*/
 			
-			firstNameToSearch = dataFromXML(thisDogXML, "first_name");
-			lastNameToSearch = dataFromXML(thisDogXML, "last_name");
+			var thisDogData = dogSpecificJson(i);
+			
+			firstNameToSearch = thisDogData.first_name;
+			lastNameToSearch = thisDogData.last_name;
 			
 			if( firstNameToSearch.search(filter) != -1 ||
 				lastNameToSearch.search(filter) != -1 )
@@ -412,6 +459,20 @@ function getDogDataViaXpath(internalId){
 	return xPathResult.snapshotItem(0);
 }
 
+function dogSpecificJson(internalId)
+{
+	var oThisDog;
+	for (var t=0; t < jsonDoc.dog.length; t++){
+		if (jsonDoc.dog[t]._id == internalId)
+		{
+			oThisDog = jsonDoc.dog[t];
+		}
+	} 
+	
+	return oThisDog
+}
+
+
 // Extracting Node list for a specific dog id
 function dogSpecificXML(internalId)
 {
@@ -441,6 +502,24 @@ function dogSpecificXML(internalId)
 	console.log(xmlData);
 	
 	return xmlData;
+}
+
+
+/**** Not in Use *********
+// This function is not in use after Json replaces XML
+function loadXML()
+{
+	 // load xml file
+	 var xhttp;
+    if (window.XMLHttpRequest) {
+       xhttp = new XMLHttpRequest();
+    } else {    // IE 5/6
+       xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    xhttp.open("GET", "dogdata.xml", false);
+    xhttp.send();
+    xmlDoc = xhttp.responseXML;
 }
 
 // From given Nodelist, extracting specific datum
@@ -477,3 +556,5 @@ function dataFromXML(xmlData, dataName)
 	
 	return dataToReturn;
 }
+
+ */
