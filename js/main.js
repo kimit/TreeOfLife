@@ -16,6 +16,8 @@ var detailSheetHeight = 300;
 
 var blinkingTime = 3000;
 
+
+
 //var cv;
 //var ctx;
 var treeImg;
@@ -45,10 +47,6 @@ function init()
 	//loadXML();
 	//cv = document.getElementById("canvas");
 	//ctx = cv.getContext("2d");
-	treeImg = new Image();
-	treeImg.src = "img/tree_transparent_half.png";
-	treeImg.id = "tree"
-	treeImg.onload = drawTree;
 }
 
 
@@ -66,11 +64,18 @@ function loadJson()
     xhttp.open("GET", "dogdata.json");
     xhttp.onreadystatechange = function()
     {
-    	if( xhttp.status === 200 &&
-    		xhttp.readyState === 4 )
+    	if( xhttp.readyState === 4 && 
+    		xhttp.status === 200 )
     	{
     		jsonDoc = JSON.parse(xhttp.responseText);
-    		console.log(jsonDoc.dog.length);
+    		//jsonDoc = jQuery.parseJSON(xhttp.responseText);
+    		console.log("dog length is " + jsonDoc.dog.length);
+    		
+    		// Drawing Tree
+    		treeImg = new Image();
+    		treeImg.src = "img/tree_transparent_half.png";
+    		treeImg.id = "tree"
+    		treeImg.onload = drawTree;
     	}
     }
     
@@ -145,6 +150,7 @@ function drawSearchBox()
 function drawLeaves()
 {
 	//var dogs = xmlDoc.getElementsByTagName("dog");
+	console.log("jsonDoc is: " + jsonDoc);
 	var dogs = jsonDoc.dog;
 	var idInData = 0;
 	var leaf;
@@ -183,7 +189,7 @@ var Leaf = function(idInData){
 	leafDiv.style.position = "absolute";	
 	leafDiv.style.top = xmlTop + "px";
 	leafDiv.style.left = xmlLeft + "px";
-	leafDiv.addEventListener('click', leafClick, true);
+	bindEvent(leafDiv, 'click', leafClick );
 	document.body.appendChild(leafDiv);
 	
 	var leafImgE = new Image();
@@ -504,6 +510,14 @@ function dogSpecificXML(internalId)
 	return xmlData;
 }
 
+// Binding event (ie9 does not support addEventListener
+function bindEvent(el, eventName, eventHandler) {
+	  if (el.addEventListener){
+	    el.addEventListener(eventName, eventHandler, false); 
+	  } else if (el.attachEvent){
+	    el.attachEvent('on'+eventName, eventHandler);
+	  }
+}
 
 /**** Not in Use *********
 // This function is not in use after Json replaces XML
