@@ -18,6 +18,10 @@ textarea {
     color: #222;
 }
 
+html {
+	font-size: 62.5%;
+}
+
 body {
     font-size: 1em;
     line-height: 1.4;
@@ -328,7 +332,7 @@ textarea {
 
 #titleP {
 	font-family: monsieur-la-doulaise, cursive;
-	font-size: 300%;
+	font-size: 500%;
 	margin: 10px;
 	text-align: center;
 }
@@ -356,7 +360,7 @@ textarea {
 #dogName {
 	font-family: vidaloka, serif;
 	color: #FFF8D9;
-	font-size: 9px;
+	font-size: 9px; font-size: 0.9rem;
 	text-align: center;
 	-webkit-user-select: none;
 	-moz-user-select: none;
@@ -365,7 +369,7 @@ textarea {
 	cursor: default;
 	
 	position: absolute;
-	top: 10px;
+	top: 10px; top: 1rem;
 	left: 0px;
 	line-height: 11px;
 }
@@ -373,16 +377,18 @@ textarea {
 #searchBox {
 	padding: 0;
 	margin: 0;
-	font-size: 75%;
-	width: 100px;
-	height: 15px;
+	font-size: 14px; font-size: 1.4rem;
+	width: 100px; width: 10rem;
+	height: 15px; height: 1.5rem;
 }
 
 /* Edit area */
 
 #editArea {
 	background:#AAAAAA;
-	font-size: 80%;
+	font-size: 13px; font-size: 1.3rem;
+	width: 200px; width: 20rem;
+	height: 650px; height: 65rem;
 }
 
 #editArea h3{
@@ -394,15 +400,23 @@ textarea {
 }
 
 #editArea form label{
-	width: 100px;
+	width: 100px; width: 10rem;
 }
 
 #editArea form input{
-	margin-bottom: 5px;
+	margin-bottom: 5px; margin-bottom: 0.5rem;
 }
 /* For Drag and Drop in edit page */
 .drag {
 	position:relative;
+}
+
+#editReset {
+	margin-left: 20px; margin-left: 2rem;
+}
+
+#editJson {
+	height: 20rem;
 }
 
 /*

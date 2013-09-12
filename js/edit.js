@@ -5,9 +5,6 @@
   * Purpose: Javascript file for the edit function for TreeOfLife web application
   */
  
-// Constants
-var Edit_Area_Width = 250; 
-
 // Global variables
 var editLeafX;
 var editLeafY;
@@ -21,6 +18,7 @@ var _dragElement;           // needs to be passed from OnMouseDown to OnMouseMov
 var _oldZIndex = 0;         // we temporarily increase the z-index during drag
 var actualPosField;   			// makes life easier
 var jsonPosField;
+var jsonWriteField;
 var xForJson = 0;
 var yForJson = 0;
 
@@ -32,8 +30,6 @@ function initEdit()
 {
 	var editArea = document.createElement("div");
 	editArea.id = "editArea";
-	editArea.style.width = Edit_Area_Width + "px";
-	editArea.style.height = "400px";
 	editArea.style.position = "absolute";
 	editArea.style.top = 0;
 	editArea.style.left = treeArea + "px";
@@ -52,8 +48,9 @@ function initEdit()
 	
 	editInfo();
 	
-	actualPosField = document.getElementById("editJson");
+	actualPosField = document.getElementById("editInfo");
 	jsonPosField = document.getElementById("jsonPos");
+	jsonWriteField = document.getElementById("editJson");
 	
 	initDragDrop();
 	
@@ -268,7 +265,9 @@ function editInfo()
 	var fOwner = document.createElement("input");
 	var fLocation = document.createElement("input");
 	var bWrite = document.createElement("input");
-	var fJson = document.createElement("p");
+	var bReset = document.createElement("input");
+	var fInfo = document.createElement("p");
+	var fJson = document.createElement("textarea");
 	
 	jsonPos.id = "jsonPos";
 	fFirstName.id = "editFirstName";
@@ -276,14 +275,17 @@ function editInfo()
 	fOwner.id = "editOwner";
 	fLocation.id = "editLocation";
 	bWrite.id = "editWrite";
-	fJson.id = "editJson";
+	bReset.id = "editReset";
+	fInfo.id = "editInfo";
+	fJson.id = "editJson"
 	
 	jsonPos.type = "text";
 	fFirstName.type = "text";
 	fLastName.type = "text";
 	fOwner.type = "text";
 	fLocation.type = "text";
-	bWrite.type = "submit";
+	bWrite.type = "button";
+	bReset.type = "submit";
 	
 	lJsonPos.setAttribute("for", jsonPos.id);
 	lFirstName.setAttribute("for", fFirstName.id);
@@ -313,12 +315,18 @@ function editInfo()
 	locationDiv.appendChild(fLocation);
 	infoForm.appendChild(locationDiv);
 	infoForm.appendChild(bWrite);
+	infoForm.appendChild(bReset);
 	editArea.appendChild(infoForm);
+	
+	editArea.appendChild(fInfo);
 	
 	editArea.appendChild(fJson);
 
 	jsonPos.value = "Drag the leaf above";
 	bWrite.value = "Write JSON";
+	bReset.value = "Reset";
+	fInfo.innerHTML = "Info area";
+	editJson.placeholder = "Here will be a text to add to JSON file.";
 	
 	bWrite.onmouseup = writeJSON;
 }
@@ -337,19 +345,16 @@ function writeJSON()
 	}
 	
 	var jsonWrite = '{' +
-        '"_id": "1",' + 
-        '"first_name": "' + $("#editFirstName").val() + '",' +
-        '"last_name": "' + $("#editLastName").val() + '",' +
-        '"owner": "' + $("#editOwner").val() + '",' +
-        '"location": "' + $("#editLocation").val() + '",' +
-        '"picture": "boxer1.jpg",' +
-        '"left": "' + leafX + '",' +
-        '"top": "' + leafY + '",' +
+        '"_id": "1",\n' + 
+        '"first_name": "' + $("#editFirstName").val() + '",\n' +
+        '"last_name": "' + $("#editLastName").val() + '",\n' +
+        '"owner": "' + $("#editOwner").val() + '",\n' +
+        '"location": "' + $("#editLocation").val() + '",\n' +
+        '"picture": "boxer1.jpg",\n' +
+        '"left": "' + leafX + '",\n' +
+        '"top": "' + leafY + '",\n' +
         '"orientation": "' + sOrientation +'"' +
       '}';
-	
-	actualPosField.innerHTML = "Copy JSON from the Alert dialog.";
-	
-	alert(jsonWrite);
-	
+
+	jsonWriteField.value = jsonWrite;	
 } 
