@@ -150,7 +150,7 @@ function drawSearchBox()
 function drawLeaves()
 {
 	//var dogs = xmlDoc.getElementsByTagName("dog");
-	console.log("jsonDoc is: " + jsonDoc);
+	//console.log("jsonDoc is: " + jsonDoc);
 	var dogs = jsonDoc.dog;
 	var idInData = 0;
 	var leaf;
