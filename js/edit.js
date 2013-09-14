@@ -43,16 +43,8 @@ function initEdit()
 	editTitle.style.height = "30px";
 	editArea.appendChild(editTitle);
 	
-	//var editTitle = document.getElementById("editTitle");
-	
     _fromTopY = extractNumber(editTitle.style.height) + 
     			extractNumber(editTitle.style.paddingTop);
-    console.log(_fromTopY);
-	
-/*	treeArea.ondragover = allowDrop;
-	treeArea.ondragenter = allowDrop;
-	treeArea.ondrop = drop;
-*/
 		
 	document.body.appendChild(editArea);
 	
@@ -199,11 +191,12 @@ function myOnMouseMove(e)
     
     yForJson = _offsetY + e.clientY - _startY + _fromTopY;
     
-    /*
+    
     actualPosField.innerHTML = "Actual Position: " + _dragElement.style.left + ', ' + 
-        _dragElement.style.top;   
-    */
-   actualPosField.innerHTML = "_offsetY: " + _offsetY + ", e.clientY: " + e.clientY + ", _startY: " + _startY + "_fromTopY: " + _fromTopY;
+        _dragElement.style.top;  
+         
+   	/* actualPosField.innerHTML = "_offsetY: " + _offsetY + ", e.clientY: " + e.clientY + 
+   	", _startY: " + _startY + ", _fromTopY: " + _fromTopY;*/
         
     jsonPosField.value = xForJson + ',' + yForJson;
     
