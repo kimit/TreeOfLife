@@ -392,7 +392,12 @@ textarea {
 }
 
 #editArea h3{
-	/*text-align: center;	*/
+	/* The following value is defined in edit.js
+	   for editTitle in initEdit()
+	margin: 0;
+	padding-top: 2rem;
+	height: 3rem;
+	*/
 }
 
 #editArea form label, form input{

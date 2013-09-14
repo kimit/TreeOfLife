@@ -14,6 +14,7 @@ var _startX = 0;            // mouse starting positions
 var _startY = 0;
 var _offsetX = 0;           // current element offset
 var _offsetY = 0;
+var _fromTopY = 0;     		// Top margin of editLeaf image from Document Top
 var _dragElement;           // needs to be passed from OnMouseDown to OnMouseMove
 var _oldZIndex = 0;         // we temporarily increase the z-index during drag
 var actualPosField;   			// makes life easier
@@ -36,7 +37,18 @@ function initEdit()
 	
 	var editTitle = document.createElement("h3");
 	editTitle.innerHTML = "Add Dog Information";
+	editTitle.id = "editTitle";
+	editTitle.style.margin = 0;
+	editTitle.style.paddingTop = "20px";
+	editTitle.style.height = "30px";
 	editArea.appendChild(editTitle);
+	
+	//var editTitle = document.getElementById("editTitle");
+	
+    _fromTopY = extractNumber(editTitle.style.height) + 
+    			extractNumber(editTitle.style.paddingTop);
+    console.log(_fromTopY);
+	
 /*	treeArea.ondragover = allowDrop;
 	treeArea.ondragenter = allowDrop;
 	treeArea.ondrop = drop;
@@ -55,6 +67,8 @@ function initEdit()
 	initDragDrop();
 	
 	flipLeaf = document.getElementById("flipLeaf");
+	
+	
 }
 
 
@@ -109,31 +123,6 @@ function loadEditLeaf(){
 
 
 // Drag and drop the leaf
-
-/*
-function dragStart(evt)
-{
-	evt.dataTransfer.setData("Text", evt.target.id);
-}
-
-function allowDrop(evt)
-{
-	evt.preventDefault();
-}
-
-function drop(evt)
-{
-	evt.preventDefault();
-	var droppedId = document.getElementById(evt.dataTransfer.getData("Text"));
-	
-	droppedId.style.top = "100px";
-	droppedId.style.left = "200px";
-	this.appendChild(droppedId);
-
-	document.getElementById("actualPos").innerHTML = "dropped";
-}
-*/
-
 // Codes were taken from 
 // http://luke.breuer.com/tutorial/javascript-drag-and-drop-tutorial.aspx
 function initDragDrop()
@@ -166,8 +155,8 @@ function myOnMouseDown(e)
         _startY = e.clientY;
         
         // grab the clicked element's position
-        _offsetX = ExtractNumber(target.style.left);
-        _offsetY = ExtractNumber(target.style.top);
+        _offsetX = extractNumber(target.style.left);
+        _offsetY = extractNumber(target.style.top);
         
         // bring the clicked element to the front while it is being dragged
         _oldZIndex = target.style.zIndex;
@@ -208,11 +197,13 @@ function myOnMouseMove(e)
     	xForJson += leafWidth;
     }
     
+    yForJson = _offsetY + e.clientY - _startY + _fromTopY;
     
-    yForJson = _offsetY + e.clientY - _startY;
-    
+    /*
     actualPosField.innerHTML = "Actual Position: " + _dragElement.style.left + ', ' + 
         _dragElement.style.top;   
+    */
+   actualPosField.innerHTML = "_offsetY: " + _offsetY + ", e.clientY: " + e.clientY + ", _startY: " + _startY + "_fromTopY: " + _fromTopY;
         
     jsonPosField.value = xForJson + ',' + yForJson;
     
@@ -236,7 +227,7 @@ function myOnMouseUp(e)
     }
 }
 
-function ExtractNumber(value)
+function extractNumber(value)
 {
     var n = parseInt(value);
 	
@@ -328,33 +319,53 @@ function editInfo()
 	fInfo.innerHTML = "Info area";
 	editJson.placeholder = "Here will be a text to add to JSON file.";
 	
-	bWrite.onmouseup = writeJSON;
+	bWrite.onmouseup =  function(){writeJson( findHighestId(jsonDoc) )};
 }
 
-// Write out the location and info to XML
-
-function writeJSON()
+// Write out the location and info to JSON
+function writeJson(highestId)
 {
 	var leafPos = $("#jsonPos").val();
 	var leafX = leafPos.split(',')[0];
 	var leafY = leafPos.split(',')[1];
 	var sOrientation = "right";
+	var nextHighestId = highestId + 1;
 	
-	if(flipLeaf.checked === true){
+	if(flipLeaf.checked === true)
+	{
 		sOrientation = "left";
 	}
 	
 	var jsonWrite = '{' +
-        '"_id": "1",\n' + 
+        '"_id": "'+ nextHighestId +'",\n' + 
         '"first_name": "' + $("#editFirstName").val() + '",\n' +
         '"last_name": "' + $("#editLastName").val() + '",\n' +
         '"owner": "' + $("#editOwner").val() + '",\n' +
         '"location": "' + $("#editLocation").val() + '",\n' +
-        '"picture": "boxer1.jpg",\n' +
+        '"picture": "boxer' + nextHighestId +'.jpg",\n' +
         '"left": "' + leafX + '",\n' +
         '"top": "' + leafY + '",\n' +
         '"orientation": "' + sOrientation +'"' +
       '}';
 
 	jsonWriteField.value = jsonWrite;	
-} 
+}
+
+// Find the highest Id number in json file
+function findHighestId(jsonDoc)
+{
+	var maxId = 0;
+	var compId = 0;
+	var Ids = jsonDoc.dog;
+	
+	for(var i=0; i < Ids.length; i++)
+	{
+		compId = extractNumber(Ids[i]._id);
+		if(maxId < compId)
+		{
+			maxId = compId;
+		}
+	}
+	
+	return maxId;
+}
