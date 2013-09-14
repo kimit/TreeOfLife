@@ -43,29 +43,6 @@
 	    "left": "149",
 	    "top": "429",
 	    "orientation": "left"
-	  },
-	  {
-	  	"_id": "5",
-		"first_name": "Mike",
-		"last_name": "Smith",
-		"owner": "John",
-		"location": "Oakland",
-		"picture": "boxer5.jpg",
-		"left": "526",
-		"top": "269",
-		"orientation": "right"
-	  },
-	  {
-	  	"_id": "6",
-		"first_name": "Mary",
-		"last_name": "Jackson",
-		"owner": "Michael",
-		"location": "Berkeley",
-		"picture": "boxer6.jpg",
-		"left": "214",
-		"top": "260",
-		"orientation": "left"
 	  }
 	]
-	
 }
