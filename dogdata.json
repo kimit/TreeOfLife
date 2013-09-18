@@ -65,7 +65,17 @@
 		"left": "214",
 		"top": "260",
 		"orientation": "left"
-	  }
+	  },
+	  {
+	  	"_id": "7",
+		"first_name": "Paul",
+		"last_name": "Grossman",
+		"owner": "Gary",
+		"location": "Alameda",
+		"picture": "boxer7.jpg",
+		"left": "310",
+		"top": "310",
+		"orientation": "left"}
 	]
 	
 }
