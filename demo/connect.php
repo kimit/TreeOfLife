@@ -5,7 +5,7 @@ if(!defined('INCLUDE_CHECK')) die('You are not allowed to execute this file dire
 
 /* Database config */
 
-$db_host		= 'localhost:8020';
+$db_host		= 'localhost';
 $db_user		= 'root';
 $db_pass		= 'root';
 $db_database	= 'toshi'; 
